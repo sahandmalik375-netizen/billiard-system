@@ -3,167 +3,212 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title> Zhilas سیستەمی بلیاردی ژیلاس</title>
+    <title>سیستەمی بلیاردی ژیلەس</title>
+    <!-- هێنانی فۆنتی مۆدێرنی Cairo لە گوگڵ -->
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-color: #1a1a1a;
-            --card-bg: #2d2d2d;
-            --primary: #27ae60; 
-            --danger: #c0392b;
-            --warning: #f39c12;
-            --text: #ffffff;
+            --bg-color: #0f172a;       /* باکگراوندی سەرەکی (شینی تاریک) */
+            --card-bg: #1e293b;      /* باکگراوندی کاردەکان */
+            --primary: #10b981;      /* ڕەنگی سەوزی سەرەکی (Emerald) */
+            --primary-hover: #059669;
+            --danger: #ef4444;       /* ڕەنگی سوور */
+            --warning: #f59e0b;      /* ڕەنگی زەرد */
+            --text-main: #f8fafc;    /* تێکستی سەرەکی */
+            --text-muted: #94a3b8;   /* تێکستی کاڵ */
+            --border: #334155;       /* هێڵەکان */
         }
+
+        * { box-sizing: border-box; }
 
         body { 
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            font-family: 'Cairo', sans-serif; 
             background-color: var(--bg-color); 
-            color: var(--text);
-            margin: 0 auto; 
-            padding: 15px; 
-            max-width: 1400px; /* بۆ ئەوەی لە شاشەی گەورە زۆر بڵاو نەبێتەوە */
+            color: var(--text-main);
+            margin: 0; 
+            padding: 0; 
+            padding-bottom: 40px;
         }
 
+        /* شریتی سەرەوە بە ستایلی Glassmorphism */
         header { 
-            background-color: var(--card-bg); 
-            padding: 20px; 
+            background: rgba(30, 41, 59, 0.85); 
+            backdrop-filter: blur(12px);
+            padding: 15px 20px; 
             text-align: center; 
-            border-radius: 12px; 
-            margin-bottom: 20px; 
-            border: 1px solid #3d3d3d;
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
         }
 
-        header h2 { margin: 0; font-size: 24px; color: var(--primary); }
+        header h2 { margin: 0; font-size: 22px; font-weight: 800; color: var(--primary); display: flex; justify-content: center; align-items: center; gap: 8px;}
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px 15px;
+        }
 
         .main-btn { 
-            background-color: var(--primary); 
-            color: white; 
-            border: none; 
-            padding: 15px; 
-            font-size: 16px; 
-            border-radius: 8px; 
-            cursor: pointer; 
-            width: 100%; 
-            margin-bottom: 20px; 
-            font-weight: bold; 
+            background: linear-gradient(135deg, var(--primary), var(--primary-hover));
+            color: white; border: none; padding: 18px; font-size: 18px; 
+            border-radius: 14px; cursor: pointer; width: 100%; 
+            margin-bottom: 25px; font-weight: 700; font-family: 'Cairo', sans-serif;
+            box-shadow: 0 8px 20px rgba(16, 185, 129, 0.25);
+            transition: all 0.2s ease;
         }
+        .main-btn:active { transform: scale(0.97); }
 
-        /* بەکارهێنانی Grid بۆ ئەوەی لە لاپتۆپ و مۆبایل گونجاو بێت */
         #active-tables {
             display: grid;
             grid-template-columns: 1fr;
-            gap: 15px;
+            gap: 20px;
         }
 
-        /* ئەگەر شاشەکە گەورەتر بوو لە 768px (لاپتۆپ و ئایپاد) */
         @media (min-width: 768px) {
-            #active-tables {
-                grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-            }
-            .main-btn {
-                width: auto;
-                padding: 15px 40px;
-            }
+            #active-tables { grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); }
+            .main-btn { width: auto; padding: 15px 40px; display: block; margin: 0 auto 30px auto; }
         }
 
         .table-card { 
-            background: var(--card-bg); 
-            padding: 20px; 
-            border-radius: 12px; 
-            border-right: 6px solid var(--primary);
-            border-top: 1px solid #3d3d3d;
-            display: flex;
-            flex-direction: column;
+            background: var(--card-bg); padding: 20px; border-radius: 20px; 
+            border: 1px solid var(--border); box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            display: flex; flex-direction: column; position: relative; overflow: hidden;
         }
 
-        .table-card h3 { margin: 0 0 15px 0; font-size: 18px; color: #f1c40f; border-bottom: 1px solid #444; padding-bottom: 10px;}
+        /* هێڵێکی ڕەنگاوڕەنگی بچووک لە سەرەوەی هەر کاردێک */
+        .table-card::before {
+            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--warning));
+        }
+
+        .table-card h3 { 
+            margin: 0 0 20px 0; font-size: 19px; color: white; font-weight: 700;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .table-card h3 span { font-size: 14px; color: var(--text-muted); font-weight: 600; background: rgba(255,255,255,0.1); padding: 4px 10px; border-radius: 20px;}
 
         .counter-section {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            background: #222;
-            padding: 10px;
-            border-radius: 8px;
-            margin-bottom: 15px;
+            display: flex; align-items: center; justify-content: space-between;
+            background: rgba(15, 23, 42, 0.6); padding: 10px 15px; border-radius: 14px; margin-bottom: 20px;
+            border: 1px solid var(--border);
         }
 
         .counter-btn {
-            background: #444; color: white; border: none; padding: 8px 15px; font-size: 18px; border-radius: 6px; cursor: pointer; font-weight: bold;
+            background: var(--border); color: white; border: none; width: 45px; height: 45px; 
+            font-size: 22px; border-radius: 12px; cursor: pointer; font-weight: bold;
+            display: flex; justify-content: center; align-items: center; transition: 0.2s;
         }
-        .counter-btn.plus { background: var(--primary); }
+        .counter-btn.plus { background: var(--primary); box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3); }
+        .counter-btn:active { transform: scale(0.9); }
 
-        .game-count { font-size: 18px; font-weight: bold; }
+        .game-count { font-size: 18px; font-weight: 800; }
 
-        /* بەشی خواردنەوەکان */
         .items-section {
-            background: #1e1e1e;
-            padding: 10px;
-            border-radius: 8px;
-            margin-bottom: 15px;
+            background: rgba(15, 23, 42, 0.6); padding: 15px; border-radius: 14px; margin-bottom: 20px;
+            border: 1px solid var(--border);
         }
-        .items-section h4 { margin: 0 0 10px 0; font-size: 14px; color: #aaa; }
+        .items-section h4 { margin: 0 0 12px 0; font-size: 15px; color: var(--text-muted); }
         
         .items-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 5px;
-            margin-bottom: 10px;
+            display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; margin-bottom: 15px;
         }
         .item-btn {
-            background: #34495e; color: white; border: none; padding: 8px 5px; font-size: 13px; border-radius: 4px; cursor: pointer;
+            background: var(--border); color: white; border: none; padding: 10px 2px; 
+            font-size: 13px; font-weight: 600; border-radius: 10px; cursor: pointer; transition: 0.2s;
+            font-family: 'Cairo', sans-serif;
         }
-        .item-btn:hover { background: #2980b9; }
+        .item-btn:active { transform: scale(0.92); background: var(--primary); }
 
-        .order-list {
-            list-style: none; padding: 0; margin: 0; font-size: 14px;
-        }
+        .order-list { list-style: none; padding: 0; margin: 0; font-size: 14px; font-weight: 600; }
         .order-list li {
-            display: flex; justify-content: space-between; align-items: center; padding: 5px 0; border-bottom: 1px dashed #444;
+            display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px dashed var(--border);
         }
+        .order-list li:last-child { border-bottom: none; padding-bottom: 0; }
+        
+        .item-name-qty { display: flex; align-items: center; gap: 8px; }
+        .qty-badge { background: var(--primary); color: white; padding: 2px 8px; border-radius: 12px; font-size: 12px;}
+        
         .remove-item {
-            background: var(--danger); color: white; border: none; border-radius: 3px; padding: 2px 6px; cursor: pointer; font-size: 12px;
+            background: rgba(239, 68, 68, 0.2); color: var(--danger); border: none; border-radius: 6px; 
+            width: 24px; height: 24px; display: flex; justify-content: center; align-items: center; cursor: pointer; transition: 0.2s;
         }
+        .remove-item:active { transform: scale(0.9); background: var(--danger); color: white;}
 
         .total-price {
-            font-size: 20px; color: var(--primary); font-weight: bold; text-align: center; margin: 10px 0 15px 0;
-            background: #222; padding: 10px; border-radius: 8px; border: 1px dashed var(--primary);
+            font-size: 22px; color: var(--primary); font-weight: 800; text-align: center; margin: 10px 0 20px 0;
+            background: rgba(16, 185, 129, 0.1); padding: 15px; border-radius: 14px; border: 1px dashed rgba(16, 185, 129, 0.4);
         }
 
         .action-btn {
-            width: 100%; padding: 12px; background: var(--danger); color: white; border: none; border-radius: 8px; font-weight: bold; font-size: 15px; cursor: pointer; margin-top: auto;
+            width: 100%; padding: 16px; background: var(--danger); color: white; border: none; 
+            border-radius: 14px; font-weight: 700; font-size: 16px; cursor: pointer; margin-top: auto;
+            font-family: 'Cairo', sans-serif; transition: 0.2s; box-shadow: 0 4px 15px rgba(239, 68, 68, 0.2);
         }
+        .action-btn:active { transform: scale(0.97); }
 
+        /* بەشی مێژوو */
         .history { 
-            margin-top: 30px; background: var(--card-bg); padding: 20px; border-radius: 12px; border: 1px solid #3d3d3d;
+            margin-top: 40px; background: var(--card-bg); padding: 25px; border-radius: 20px; 
+            border: 1px solid var(--border); box-shadow: 0 10px 30px rgba(0,0,0,0.2);
         }
-        .history h3 { margin-top: 0; color: #1abc9c; border-bottom: 1px solid #444; padding-bottom: 10px; }
+        
+        .history-header {
+            display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 15px; margin-bottom: 15px;
+        }
+        .history-header h3 { margin: 0; color: white; font-size: 20px; font-weight: 800;}
+        
+        .clear-history-btn {
+            background: rgba(239, 68, 68, 0.1); color: var(--danger); border: 1px solid var(--danger); 
+            padding: 8px 15px; border-radius: 10px; cursor: pointer; font-size: 14px; font-weight: 700; font-family: 'Cairo', sans-serif;
+            transition: 0.2s;
+        }
+        .clear-history-btn:active { transform: scale(0.95); background: var(--danger); color: white;}
+
         .history-item { 
-            border-bottom: 1px solid #3d3d3d; padding: 12px 0; display: flex; justify-content: space-between; align-items: center;
+            background: rgba(15, 23, 42, 0.4); border: 1px solid var(--border); border-radius: 14px;
+            padding: 15px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;
         }
-        .price { font-weight: bold; color: var(--primary); font-size: 1.1em; }
+        .history-info p { margin: 0 0 5px 0; font-weight: 700; font-size: 16px; color: white;}
+        .history-info small { color: var(--text-muted); font-weight: 600; font-size: 13px; line-height: 1.6;}
+        
+        .history-actions { display: flex; align-items: center; gap: 15px; }
+        .price { font-weight: 800; color: var(--primary); font-size: 18px; background: rgba(16, 185, 129, 0.1); padding: 5px 12px; border-radius: 10px;}
+        
+        .restore-btn {
+            background: rgba(245, 158, 11, 0.15); color: var(--warning); border: none; 
+            padding: 8px 12px; border-radius: 10px; cursor: pointer; font-size: 13px; font-weight: 700; font-family: 'Cairo', sans-serif;
+            transition: 0.2s; display: flex; align-items: center; gap: 5px;
+        }
+        .restore-btn:active { transform: scale(0.95); background: var(--warning); color: #000;}
     </style>
 </head>
 <body>
 
     <header>
-        <h2>🎱 بلیاردی ژیلاس (Zhilas)</h2>
+        <h2>🎱 بلیاردی ژیلەس</h2>
     </header>
 
-    <button class="main-btn" onclick="addTable()">+ زیادکردنی کڕیار / مێزی نوێ</button>
+    <div class="container">
+        <button class="main-btn" onclick="addTable()">+ کردنەوەی مێزێکی نوێ</button>
 
-    <!-- مێزە ئەکتیڤەکان -->
-    <div id="active-tables"></div>
+        <!-- مێزە ئەکتیڤەکان -->
+        <div id="active-tables"></div>
 
-    <!-- تۆماری کۆتایی -->
-    <div class="history">
-        <h3>📜 تۆماری گشتی و حیساباتی ئەمڕۆ</h3>
-        <div id="history-list"></div>
+        <!-- تۆماری کۆتایی -->
+        <div class="history">
+            <div class="history-header">
+                <h3>📜 تۆماری ئەمڕۆ</h3>
+                <button class="clear-history-btn" onclick="clearHistory()">🗑️ سڕینەوەی داتا</button>
+            </div>
+            <div id="history-list"></div>
+        </div>
     </div>
 
     <script>
         const GAME_RATE = 500; 
 
-        // لیستی مەواد و نرخەکانیان
         const menuItems = {
             'water': { name: 'ئاو', price: 500 },
             'red': { name: 'ڕێد', price: 1000 },
@@ -188,7 +233,8 @@
                 id: Date.now(),
                 name: name,
                 gamesPlayed: 1,
-                orders: {} // شوێنی خەزنکردنی داواکارییەکان: { 'water': 2, 'red': 1 }
+                orders: {},
+                openTime: new Date().toLocaleTimeString('ku-IQ', { hour: '2-digit', minute: '2-digit' })
             };
 
             activeTables.push(newTable);
@@ -231,10 +277,7 @@
             if (tableIndex > -1) {
                 const table = activeTables[tableIndex];
                 
-                // حیسابکردنی یارییەکان
                 const gamesCost = table.gamesPlayed * GAME_RATE;
-                
-                // حیسابکردنی مەوادەکان
                 let itemsCost = 0;
                 let itemsDetail = [];
                 if (table.orders) {
@@ -247,9 +290,11 @@
 
                 const totalCost = gamesCost + itemsCost;
 
-                if (!confirm(`دڵنیایت لە کۆتایی هێنان بە حیسابی ${table.name}؟\nکۆی گشتی: ${totalCost} دینار`)) return;
+                if (!confirm(`دڵنیایت لە وەرگرتنی حیسابی (${table.name})؟\n\nکۆی گشتی: ${totalCost} دینار`)) return;
 
                 const historyItem = {
+                    historyId: Date.now(), 
+                    originalData: table, 
                     name: table.name,
                     games: table.gamesPlayed,
                     itemsStr: itemsDetail.join('، ') || 'هیچ',
@@ -265,16 +310,44 @@
             }
         }
 
+        function restoreTable(historyId) {
+            const index = historyLog.findIndex(h => h.historyId === historyId);
+            if (index > -1) {
+                const log = historyLog[index];
+                
+                if (log.originalData) {
+                    activeTables.push(log.originalData);
+                } else {
+                    activeTables.push({
+                        id: Date.now(), name: log.name, gamesPlayed: log.games, orders: {}, openTime: log.time
+                    });
+                }
+
+                historyLog.splice(index, 1);
+                saveToStorage();
+                renderUI();
+            }
+        }
+
+        function clearHistory() {
+            if (historyLog.length === 0) {
+                alert("هیچ داتایەک بوونی نییە بۆ سڕینەوە!");
+                return;
+            }
+            if (confirm("⚠️ ئاگاداری: دڵنیایت لە سڕینەوەی هەموو تۆمارەکانی ئەمڕۆ؟ ئەم کارە ناگەڕێتەوە!")) {
+                historyLog = [];
+                saveToStorage();
+                renderUI();
+            }
+        }
+
         function renderUI() {
             const tablesDiv = document.getElementById('active-tables');
             tablesDiv.innerHTML = '';
 
             activeTables.forEach(table => {
-                // دڵنیابوونەوە لە هەبوونی ئۆبجێکتی ئۆردەر
                 if (!table.orders) table.orders = {};
-
                 const gamesCost = table.gamesPlayed * GAME_RATE;
-                
                 let itemsCost = 0;
                 let ordersHtml = '';
                 
@@ -283,10 +356,13 @@
                     itemsCost += itemPrice;
                     ordersHtml += `
                         <li>
-                            <span>${menuItems[key].name} (x${qty})</span>
-                            <div>
-                                <span>${itemPrice} د.ع</span>
-                                <button class="remove-item" onclick="removeOrderItem(${table.id}, '${key}')">X</button>
+                            <div class="item-name-qty">
+                                <span class="qty-badge">${qty}x</span>
+                                <span>${menuItems[key].name}</span>
+                            </div>
+                            <div style="display:flex; align-items:center; gap:10px;">
+                                <span style="color:#94a3b8;">${itemPrice}</span>
+                                <button class="remove-item" onclick="removeOrderItem(${table.id}, '${key}')">✖</button>
                             </div>
                         </li>
                     `;
@@ -296,7 +372,7 @@
 
                 tablesDiv.innerHTML += `
                     <div class="table-card">
-                        <h3>👤 کڕیار: ${table.name}</h3>
+                        <h3>👤 ${table.name} <span>🕒 ${table.openTime || 'ئێستا'}</span></h3>
                         
                         <div class="counter-section">
                             <button class="counter-btn" onclick="changeGameCount(${table.id}, -1)">-</button>
@@ -305,21 +381,19 @@
                         </div>
 
                         <div class="items-section">
-                            <h4>☕ خواردنەوە و شیرینی</h4>
+                            <h4>🛒 خواردنەوەکان</h4>
                             <div class="items-grid">
-                                <button class="item-btn" onclick="addOrderItem(${table.id}, 'water')">+ ئاو</button>
-                                <button class="item-btn" onclick="addOrderItem(${table.id}, 'red')">+ ڕێد</button>
-                                <button class="item-btn" onclick="addOrderItem(${table.id}, 'asan')">+ ئاسان</button>
-                                <button class="item-btn" onclick="addOrderItem(${table.id}, 'dew')">+ دیوو</button>
-                                <button class="item-btn" onclick="addOrderItem(${table.id}, 'torta')">+ تۆرتە</button>
+                                <button class="item-btn" onclick="addOrderItem(${table.id}, 'water')">ئاو</button>
+                                <button class="item-btn" onclick="addOrderItem(${table.id}, 'red')">ڕێد</button>
+                                <button class="item-btn" onclick="addOrderItem(${table.id}, 'asan')">ئاسان</button>
+                                <button class="item-btn" onclick="addOrderItem(${table.id}, 'dew')">دیوو</button>
+                                <button class="item-btn" onclick="addOrderItem(${table.id}, 'torta')">تۆرتە</button>
                             </div>
-                            <ul class="order-list">
-                                ${ordersHtml}
-                            </ul>
+                            ${ordersHtml ? `<ul class="order-list">${ordersHtml}</ul>` : ''}
                         </div>
 
-                        <div class="total-price">کۆی گشتی: ${grandTotal} دینار</div>
-                        <button class="action-btn" onclick="finishTable(${table.id})">🔒 وەرگرتنی حیسابەکە</button>
+                        <div class="total-price">${grandTotal.toLocaleString('en-US')} د.ع</div>
+                        <button class="action-btn" onclick="finishTable(${table.id})">🔒 داخستنی حیسابەکە</button>
                     </div>
                 `;
             });
@@ -330,11 +404,14 @@
             historyLog.slice().reverse().forEach(log => {
                 historyDiv.innerHTML += `
                     <div class="history-item">
-                        <div>
-                            <p style="margin: 0; font-weight: bold;">${log.name} (${log.time})</p>
-                            <small style="color: #aaa; display: block;">${log.games} یاری | مەواد: ${log.itemsStr}</small>
+                        <div class="history-info">
+                            <p>👤 ${log.name} <span style="color:var(--text-muted); font-size:13px; font-weight:normal;">(${log.time})</span></p>
+                            <small>🎮 ${log.games} یاری <br> ☕ مەواد: ${log.itemsStr}</small>
                         </div>
-                        <span class="price">${log.price} د.ع</span>
+                        <div class="history-actions">
+                            <button class="restore-btn" onclick="restoreTable(${log.historyId})">↩️ گەڕاندنەوە</button>
+                            <span class="price">${log.price.toLocaleString('en-US')} د.ع</span>
+                        </div>
                     </div>
                 `;
             });
