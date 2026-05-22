@@ -2,9 +2,13 @@
 <html lang="ku" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#080c14">
 <title>بلیاردی ژیلاس</title>
-<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Noto+Kufi+Arabic:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 <style>
 :root {
   --bg: #080c14;
@@ -19,14 +23,18 @@
   --text: #e2e8f0;
   --muted: #64748b;
   --glow: rgba(0,229,255,0.15);
+  --font: 'Cairo', 'Noto Kufi Arabic', 'Segoe UI', Tahoma, Arial, sans-serif;
 }
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body {
-  font-family: 'Cairo', sans-serif;
+  font-family: var(--font);
   background: var(--bg);
   color: var(--text);
   min-height: 100vh;
   overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
 }
 
 /* Background grid */
@@ -89,7 +97,7 @@ body::before {
   border-radius: 10px;
   cursor: pointer;
   font-size: 13px;
-  font-family: 'Cairo', sans-serif;
+  font-family: var(--font);
   font-weight: 600;
   transition: all 0.2s;
 }
@@ -114,7 +122,7 @@ body::before {
   color: var(--muted);
   border-bottom: 2px solid transparent;
   transition: all 0.2s;
-  font-family: 'Cairo', sans-serif;
+  font-family: var(--font);
 }
 .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
 
@@ -176,7 +184,7 @@ body::before {
   border: 1px dashed rgba(0,229,255,0.4);
   border-radius: 14px;
   color: var(--accent);
-  font-family: 'Cairo', sans-serif;
+  font-family: var(--font);
   font-size: 15px;
   font-weight: 700;
   cursor: pointer;
@@ -186,6 +194,8 @@ body::before {
   align-items: center;
   justify-content: center;
   gap: 8px;
+  min-height: 50px;
+  -webkit-tap-highlight-color: transparent;
 }
 .add-table-btn:hover {
   background: linear-gradient(135deg, rgba(0,229,255,0.18), rgba(124,58,237,0.18));
@@ -252,17 +262,19 @@ body::before {
   margin-bottom: 10px;
 }
 .item-btn {
-  padding: 8px 4px;
+  padding: 10px 4px;
   border-radius: 10px;
   border: 1px solid var(--border);
   background: var(--surface);
   color: var(--text);
-  font-family: 'Cairo', sans-serif;
+  font-family: var(--font);
   font-size: 12px;
   font-weight: 700;
   cursor: pointer;
   transition: all 0.15s;
   text-align: center;
+  min-height: 48px;
+  -webkit-tap-highlight-color: transparent;
 }
 .item-btn:hover {
   background: rgba(0,229,255,0.08);
@@ -282,14 +294,16 @@ body::before {
 .table-actions { display: flex; gap: 6px; }
 .action-btn {
   flex: 1;
-  padding: 10px;
+  padding: 12px;
   border-radius: 10px;
   border: none;
-  font-family: 'Cairo', sans-serif;
+  font-family: var(--font);
   font-size: 13px;
   font-weight: 700;
   cursor: pointer;
   transition: all 0.2s;
+  min-height: 44px;
+  -webkit-tap-highlight-color: transparent;
 }
 .finish-btn {
   background: rgba(239,68,68,0.15);
@@ -423,7 +437,7 @@ body::before {
   border-radius: 10px;
   padding: 10px 14px;
   color: var(--text);
-  font-family: 'Cairo', sans-serif;
+  font-family: var(--font);
   font-size: 14px;
 }
 .expense-input-row input:focus { outline: none; border-color: rgba(0,229,255,0.4); }
@@ -433,7 +447,7 @@ body::before {
   color: #f87171;
   padding: 10px 16px;
   border-radius: 10px;
-  font-family: 'Cairo', sans-serif;
+  font-family: var(--font);
   font-weight: 700;
   font-size: 13px;
   cursor: pointer;
@@ -522,7 +536,7 @@ body::before {
   border-radius: 12px;
   padding: 14px 16px;
   color: var(--text);
-  font-family: 'Cairo', sans-serif;
+  font-family: var(--font);
   font-size: 16px;
   font-weight: 600;
   margin-bottom: 12px;
@@ -535,12 +549,13 @@ body::before {
   border: 1px solid rgba(0,229,255,0.4);
   border-radius: 12px;
   color: var(--accent);
-  font-family: 'Cairo', sans-serif;
+  font-family: var(--font);
   font-size: 16px;
   font-weight: 800;
   cursor: pointer;
   transition: all 0.2s;
   margin-bottom: 8px;
+  -webkit-tap-highlight-color: transparent;
 }
 .modal-confirm:hover { background: linear-gradient(135deg, rgba(0,229,255,0.3), rgba(124,58,237,0.3)); }
 .modal-cancel {
@@ -549,7 +564,7 @@ body::before {
   background: none;
   border: none;
   color: var(--muted);
-  font-family: 'Cairo', sans-serif;
+  font-family: var(--font);
   font-size: 14px;
   cursor: pointer;
 }
@@ -593,6 +608,26 @@ body::before {
 ::-webkit-scrollbar { width: 4px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+/* Mobile improvements */
+@media (max-width: 480px) {
+  .header { padding: 10px 12px; }
+  .logo h1 { font-size: 16px; }
+  .page { padding: 12px; }
+  .stat-value { font-size: 18px; }
+  .btn-grid { grid-template-columns: repeat(3, 1fr); gap: 5px; }
+  .item-btn .item-name { font-size: 11px; }
+  .item-btn .item-price { font-size: 10px; }
+  .tabs { top: 57px; }
+  .tab { font-size: 12px; padding: 11px 4px; }
+  .table-total { font-size: 16px; }
+  .report-summary { grid-template-columns: 1fr 1fr 1fr; }
+  .r-val { font-size: 14px; }
+  body { padding-bottom: env(safe-area-inset-bottom); }
+}
+button, input, select { font-family: var(--font) !important; }
+input::placeholder { font-family: var(--font); }
+
 </style>
 </head>
 <body>
