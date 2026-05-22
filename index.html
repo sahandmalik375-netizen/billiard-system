@@ -2,90 +2,99 @@
 <html lang="ku" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>بلیاردی ژیلاس Zhilas  - سیستەمی پرۆفیشناڵ</title>
+    <title>سیستەمی پرۆفیشناڵی ژیلاس</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --bg-deep: #0a1128; --card-deep: #16213e; --accent: #4cc9f0;
-            --danger: #f72585; --text-light: #e0e0e0; --border: #1f4068;
-        }
-        body { font-family: 'Cairo', sans-serif; background-color: var(--bg-deep); color: var(--text-light); margin: 0; padding: 20px; }
-        .dashboard { background: var(--accent); color: var(--bg-deep); padding: 20px; border-radius: 15px; text-align: center; margin-bottom: 20px; font-weight: 900; font-size: 24px; }
-        .btn-main { background: var(--accent); border: none; padding: 15px; border-radius: 10px; width: 100%; font-weight: bold; cursor: pointer; }
-        .card { background: var(--card-deep); border: 1px solid var(--border); padding: 20px; border-radius: 15px; margin-top: 20px; }
-        .item-row { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); padding: 10px 0; }
-        .btn-del { background: var(--danger); color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer; }
+        :root { --bg-deep: #0a1128; --card-deep: #16213e; --accent: #4cc9f0; --danger: #f72585; --success: #4ade80; }
+        body { font-family: 'Cairo', sans-serif; background-color: var(--bg-deep); color: white; margin: 0; padding: 20px; }
+        .grid-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 20px; }
+        .stat-card { background: var(--card-deep); padding: 15px; border-radius: 10px; text-align: center; border: 1px solid #1f4068; }
+        .btn-main { background: var(--accent); border: none; padding: 15px; border-radius: 10px; width: 100%; font-weight: bold; cursor: pointer; margin-bottom: 10px; }
+        .btn-exp { background: var(--danger); }
+        .card { background: var(--card-deep); padding: 20px; border-radius: 15px; margin-top: 10px; }
+        .item-row { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #1f4068; padding: 10px 0; }
     </style>
 </head>
 <body>
 
-    <div class="dashboard" id="total-display">داهاتی ئەمڕۆ: 0 د.ع</div>
-    <button class="btn-main" onclick="addTable()">+ کردنەوەی مێز</button>
-    
-    <div id="active-tables"></div>
+    <div class="grid-stats">
+        <div class="stat-card">داهات<br><span id="income">0</span></div>
+        <div class="stat-card">خەرجی<br><span id="expenses">0</span></div>
+        <div class="stat-card">قازانج<br><span id="profit">0</span></div>
+    </div>
 
+    <button class="btn-main" onclick="addTable()">+ مێزی نوێ</button>
+    <button class="btn-main btn-exp" onclick="addExpense()">+ تۆمارکردنی خەرجی</button>
+    <button class="btn-main" style="background:var(--success)" onclick="exportToExcel()">📥 دابەزاندنی Excel</button>
+
+    <div id="active-tables"></div>
     <div class="card">
         <h3>📜 مێژووی تۆمارەکان</h3>
-        <select id="filter" onchange="render()">
-            <option value="today">تەنها ئەمڕۆ</option>
-            <option value="all">هەموو مێژوو</option>
-        </select>
         <div id="history-list"></div>
     </div>
 
     <script>
-        // دەنگی سیستەم
-        const audioSuccess = new Audio('https://actions.google.com/sounds/v1/ui/check_mark_success.ogg');
-        const audioClick = new Audio('https://actions.google.com/sounds/v1/ui/tap.ogg');
-
+        const audio = new Audio('https://actions.google.com/sounds/v1/ui/check_mark_success.ogg');
         let tables = JSON.parse(localStorage.getItem('zhilas_tables')) || [];
         let history = JSON.parse(localStorage.getItem('zhilas_history')) || [];
-
-        function playSound(type) { type === 'success' ? audioSuccess.play() : audioClick.play(); }
+        let expenses = JSON.parse(localStorage.getItem('zhilas_expenses')) || [];
 
         function render() {
-            // نوێکردنەوەی داشبۆرد
-            let todayTotal = history.filter(h => h.date === new Date().toLocaleDateString()).reduce((sum, h) => sum + h.price, 0);
-            document.getElementById('total-display').innerText = "داهاتی ئەمڕۆ: " + todayTotal.toLocaleString() + " د.ع";
+            let totalIncome = history.reduce((sum, h) => sum + h.price, 0);
+            let totalExpenses = expenses.reduce((sum, e) => sum + e.amount, 0);
+            
+            document.getElementById('income').innerText = totalIncome;
+            document.getElementById('expenses').innerText = totalExpenses;
+            document.getElementById('profit').innerText = (totalIncome - totalExpenses);
 
             const container = document.getElementById('active-tables');
             container.innerHTML = '';
-            tables.forEach((t, index) => {
-                container.innerHTML += `<div class="card"><h3>${t.name} - ${t.games} یاری</h3>
-                    <button onclick="addOrder(${index})">زیادکردنی مەواد</button>
-                    <button onclick="finish(${index})">داخستن</button></div>`;
+            tables.forEach((t, i) => {
+                container.innerHTML += `<div class="card">${t.name} <button onclick="finish(${i})">داخستن</button></div>`;
             });
 
-            const filter = document.getElementById('filter').value;
             const hist = document.getElementById('history-list');
             hist.innerHTML = '';
-            history.filter(h => filter === 'all' || h.date === new Date().toLocaleDateString()).forEach((h, index) => {
-                hist.innerHTML += `<div class="item-row"><span>${h.name} - ${h.price} د.ع</span>
-                    <button class="btn-del" onclick="deleteHistory(${index})">سڕینەوە</button></div>`;
+            history.forEach((h, i) => {
+                hist.innerHTML += `<div class="item-row"><span>${h.name} (${h.price} د.ع)</span><button onclick="delHistory(${i})">سڕینەوە</button></div>`;
             });
         }
 
         function addTable() {
-            playSound('click');
             let name = prompt("ناوی کڕیار:");
-            if(name) { tables.push({name, games: 1, price: 500, date: new Date().toLocaleDateString()}); save(); }
+            if(name) { tables.push({name, price: 500}); save(); }
         }
 
-        function finish(index) {
-            playSound('success');
-            history.push(tables[index]);
-            tables.splice(index, 1);
+        function addExpense() {
+            let amount = prompt("بڕی خەرجی:");
+            if(amount) { expenses.push({amount: parseInt(amount)}); save(); }
+        }
+
+        function finish(i) {
+            audio.play();
+            history.push(tables[i]);
+            tables.splice(i, 1);
             save();
         }
 
-        function deleteHistory(index) {
-            if(confirm("دڵنیایت؟")) { history.splice(index, 1); save(); }
-        }
+        function delHistory(i) { history.splice(i, 1); save(); }
 
-        function save() { 
+        function save() {
             localStorage.setItem('zhilas_tables', JSON.stringify(tables));
             localStorage.setItem('zhilas_history', JSON.stringify(history));
-            render(); 
+            localStorage.setItem('zhilas_expenses', JSON.stringify(expenses));
+            render();
+        }
+
+        function exportToExcel() {
+            let csv = "ناوی کڕیار,بڕی پارە\n";
+            history.forEach(h => csv += `${h.name},${h.price}\n`);
+            let blob = new Blob([csv], { type: 'text/csv' });
+            let url = window.URL.createObjectURL(blob);
+            let a = document.createElement('a');
+            a.href = url;
+            a.download = "Zhilas_Report.csv";
+            a.click();
         }
 
         render();
