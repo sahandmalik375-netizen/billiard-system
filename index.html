@@ -2,27 +2,17 @@
 <html lang="ku" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>بلیاردی ژیلاس - سیستەمی پرۆفیشناڵ</title>
+    <title>سیستەمی پرۆفیشناڵی ژیلاس - V.Final</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
-        :root { --bg-deep: #0a1128; --card-deep: #16213e; --accent: #4cc9f0; --danger: #f72585; --text: #e0e0e0; }
-        body { font-family: 'Cairo', sans-serif; background-color: var(--bg-deep); color: var(--text); margin: 0; padding: 20px; }
-        
-        /* داشبۆرد */
+        :root { --bg: #0a1128; --card: #16213e; --accent: #4cc9f0; --danger: #f72585; --success: #4ade80; --text: #e0e0e0; }
+        body { font-family: 'Cairo', sans-serif; background-color: var(--bg); color: var(--text); margin: 0; padding: 20px; }
         .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 20px; }
-        .stat-card { background: var(--card-deep); padding: 15px; border-radius: 12px; text-align: center; border: 1px solid var(--accent); }
-        
-        /* مێزەکان */
-        .card { background: var(--card-deep); padding: 20px; border-radius: 15px; margin-bottom: 15px; border: 1px solid #1f4068; }
-        .order-list { list-style: none; padding: 0; margin: 10px 0; color: #aaa; font-size: 14px; }
-        
-        /* دوگمەکان */
-        .btn { background: var(--accent); border: none; padding: 12px; border-radius: 8px; cursor: pointer; font-weight: bold; margin: 5px; }
-        
-        /* مۆدال (Popup) */
+        .stat-card { background: var(--card); padding: 15px; border-radius: 12px; text-align: center; border: 1px solid var(--accent); }
+        .card { background: var(--card); padding: 20px; border-radius: 15px; margin-bottom: 15px; border: 1px solid #1f4068; }
+        .btn { background: var(--accent); border: none; padding: 10px; border-radius: 8px; cursor: pointer; font-weight: bold; margin: 2px; }
         .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: none; justify-content: center; align-items: center; z-index: 1000; }
-        .modal-content { background: var(--card-deep); padding: 30px; border-radius: 20px; text-align: center; border: 2px solid var(--accent); }
-        input { padding: 10px; border-radius: 5px; border: none; width: 80%; margin-bottom: 15px; }
+        .modal-content { background: var(--card); padding: 30px; border-radius: 20px; text-align: center; border: 2px solid var(--accent); }
     </style>
 </head>
 <body>
@@ -33,74 +23,87 @@
         <div class="stat-card">قازانج<br><b id="pro">0</b></div>
     </div>
 
-    <button class="btn" onclick="showModal()">+ کردنەوەی مێزی نوێ</button>
+    <button class="btn" onclick="openModal('table')">+ مێزی نوێ</button>
+    <button class="btn" style="background:var(--danger)" onclick="openModal('expense')">+ خەرجی</button>
+    <button class="btn" style="background:var(--success)" onclick="exportExcel()">📥 Excel</button>
 
     <div id="active-tables"></div>
 
     <div id="modal" class="modal">
         <div class="modal-content">
-            <h3>ناوی کڕیار بنووسە</h3>
-            <input type="text" id="clientName" placeholder="ناوی کڕیار...">
-            <br>
-            <button class="btn" onclick="saveNewTable()">تۆمارکردن</button>
-            <button class="btn" style="background:var(--danger)" onclick="hideModal()">داخستن</button>
+            <h3 id="modal-title">ناوی کڕیار</h3>
+            <input type="text" id="inputVal" placeholder="بنووسە...">
+            <br><br>
+            <button class="btn" onclick="processInput()">تۆمارکردن</button>
+            <button class="btn" onclick="closeModal()">داخستن</button>
         </div>
     </div>
 
     <script>
-        let tables = JSON.parse(localStorage.getItem('zhilas_tables')) || [];
-        let history = JSON.parse(localStorage.getItem('zhilas_history')) || [];
-        let expenses = JSON.parse(localStorage.getItem('zhilas_expenses')) || [];
+        let state = {
+            tables: JSON.parse(localStorage.getItem('zhilas_tables')) || [],
+            history: JSON.parse(localStorage.getItem('zhilas_history')) || [],
+            expenses: JSON.parse(localStorage.getItem('zhilas_expenses')) || [],
+            mode: ''
+        };
 
-        function showModal() { document.getElementById('modal').style.display = 'flex'; }
-        function hideModal() { document.getElementById('modal').style.display = 'none'; }
+        function openModal(mode) { state.mode = mode; document.getElementById('modal').style.display = 'flex'; }
+        function closeModal() { document.getElementById('modal').style.display = 'none'; }
 
-        function saveNewTable() {
-            let name = document.getElementById('clientName').value;
-            if(name) { 
-                tables.push({name, orders: [], games: 1, total: 500}); 
-                save(); hideModal(); 
-            }
+        function processInput() {
+            let val = document.getElementById('inputVal').value;
+            if(!val) return;
+            if(state.mode === 'table') state.tables.push({name: val, orders: [], total: 500});
+            else state.expenses.push({amount: parseInt(val)});
+            save(); closeModal();
         }
 
         function addOrder(i, item, price) {
-            tables[i].orders.push({item, price});
-            tables[i].total += price;
+            state.tables[i].orders.push({item, price});
+            state.tables[i].total += price;
             save();
         }
 
         function finish(i) {
-            history.push(tables[i]);
-            tables.splice(i, 1);
+            state.history.push(state.tables[i]);
+            state.tables.splice(i, 1);
             save();
         }
 
         function save() {
-            localStorage.setItem('zhilas_tables', JSON.stringify(tables));
-            localStorage.setItem('zhilas_history', JSON.stringify(history));
+            localStorage.setItem('zhilas_tables', JSON.stringify(state.tables));
+            localStorage.setItem('zhilas_history', JSON.stringify(state.history));
+            localStorage.setItem('zhilas_expenses', JSON.stringify(state.expenses));
             render();
         }
 
         function render() {
-            document.getElementById('inc').innerText = history.reduce((s, h) => s + h.total, 0);
-            document.getElementById('exp').innerText = expenses.reduce((s, e) => s + e.amount, 0);
-            document.getElementById('pro').innerText = (history.reduce((s, h) => s + h.total, 0) - expenses.reduce((s, e) => s + e.amount, 0));
+            let inc = state.history.reduce((s, h) => s + h.total, 0);
+            let exp = state.expenses.reduce((s, e) => s + e.amount, 0);
+            document.getElementById('inc').innerText = inc;
+            document.getElementById('exp').innerText = exp;
+            document.getElementById('pro').innerText = inc - exp;
 
             const container = document.getElementById('active-tables');
             container.innerHTML = '';
-            tables.forEach((t, i) => {
-                let orderList = t.orders.map(o => `<li>${o.item}: ${o.price}</li>`).join('');
-                container.innerHTML += `
-                    <div class="card">
-                        <h3>👤 ${t.name} - ${t.total} د.ع</h3>
-                        <ul class="order-list">${orderList}</ul>
-                        <button class="btn" onclick="addOrder(${i}, 'ئاو', 500)">+ ئاو</button>
-                        <button class="btn" onclick="addOrder(${i}, 'ڕێد', 1000)">+ ڕێد</button>
-                        <button class="btn" style="background:var(--danger)" onclick="finish(${i})">داخستن</button>
-                    </div>
-                `;
+            state.tables.forEach((t, i) => {
+                let orders = t.orders.map(o => o.item).join(', ');
+                container.innerHTML += `<div class="card">
+                    <h3>👤 ${t.name} - ${t.total} د.ع</h3>
+                    <p style="font-size:12px; color:#aaa">خواردن: ${orders || 'هیچ'}</p>
+                    <button class="btn" onclick="addOrder(${i}, 'ئاو', 500)">+ ئاو</button>
+                    <button class="btn" onclick="addOrder(${i}, 'ڕێد', 1000)">+ ڕێد</button>
+                    <button class="btn" style="background:var(--danger)" onclick="finish(${i})">داخستن</button>
+                </div>`;
             });
         }
+
+        function exportExcel() {
+            let csv = "ناوی کڕیار,کۆی پارە\n" + state.history.map(h => `${h.name},${h.total}`).join("\n");
+            let blob = new Blob([csv], {type: 'text/csv'});
+            let a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = "Report.csv"; a.click();
+        }
+
         render();
     </script>
 </body>
