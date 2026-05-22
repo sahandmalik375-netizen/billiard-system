@@ -8,7 +8,7 @@
 <title>بلیاردی ژیلاس</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Noto+Kufi+Arabic:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+
 <style>
 :root {
   --bg: #080c14;
@@ -23,7 +23,8 @@
   --text: #e2e8f0;
   --muted: #64748b;
   --glow: rgba(0,229,255,0.15);
-  --font: 'Cairo', 'Noto Kufi Arabic', 'Segoe UI', Tahoma, Arial, sans-serif;
+  --font: system-ui, -apple-system, 'Segoe UI', 'Noto Sans Arabic', 'Tahoma', sans-serif;
+
 }
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body {
@@ -35,6 +36,12 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
+  body {
+  font-family: var(--font);
+  font-weight: 400;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+     }
 }
 
 /* Background grid */
@@ -765,6 +772,8 @@ input::placeholder { font-family: var(--font); }
       <div>
         <div class="settings-row-label">🎱 بلیاردی ژیلاس</div>
         <div class="settings-row-sub">ڤێرشن 2.0 — سیستەمی پرۆفیشناڵ</div>
+          <div class="settings-row-label">👨‍💻 پڕۆگرامەر</div>
+      <div class="settings-row-sub">by Sahand Jaff</div>
       </div>
     </div>
   </div>
@@ -1039,6 +1048,10 @@ function confirmDiscount() {
   if (val > t.total) { showToast('داشکاندن زیاترە لە کۆی گشتی'); return; }
   t.total -= val;
   t.discount = (t.discount || 0) + val;
+  if (val > t.total) {
+  showToast('داشکاندن نابێت لە کۆی گشتی مێزەکە زیاتر بێت');
+  return;
+}
   if (!t.items) t.items = [];
   t.items.push({ name: 'داشکاندن', price: -val, time: timeStr(new Date()) });
   save(); closeModal('modal-discount');
@@ -1046,14 +1059,24 @@ function confirmDiscount() {
 }
 
 function finishTable(id) {
-  const idx = state.tables.findIndex(x => x.id === id);
-  if (idx === -1) return;
-  const t = state.tables[idx];
+  const t = state.tables.find(x => x.id === id);
+  if (!t) return;
+  
+  // دڵنیاکردنەوە لە داخستن
+  const confirmMsg = `دڵنیای مێزی "${t.name}" داخەیت؟ کۆی گشتی: ${fmtNum(t.total)} د.ع`;
+  if (!confirm(confirmMsg)) return;
+  
+  // ئەگەر بڕی مێزەکە ٠ بێت و تۆ نەتویست داخرێت، ڕێگەم بدە بەڵام ئاگاداری بکەرەوە
+  if (t.total === 0) {
+    if (!confirm('ئاگاداری! ئەم مێزە هیچ کاڵایەکی تێدا نییە (بڕی ٠). هەر دەتەوێت داخەیت؟')) return;
+  }
+  
   t.endTime = timeStr(new Date());
   t.date = today();
   state.history.push({...t});
-  state.tables.splice(idx, 1);
-  save(); showToast(`✅ ${t.name} داخرا — ${fmtNum(t.total)} د.ع`);
+  state.tables.splice(state.tables.findIndex(x => x.id === id), 1);
+  save();
+  showToast(`✅ ${t.name} داخرا — ${fmtNum(t.total)} د.ع`);
 }
 
 function undoLast() {
@@ -1090,9 +1113,13 @@ function clearTodayHistory() {
 }
 
 function clearAllData() {
+  if (state.tables.length > 0) {
+    if (!confirm(`ئاگاداری! هێشتا ${state.tables.length} مێزی چالاک هەیە. ئایا دڵنیایت کە هەموو داتاکان بسڕیتەوە؟`)) return;
+  }
   if (!confirm('⚠️ دڵنیایت هەموو داتاکان دەسڕیتەوە؟ ئەم کارە گەڕانەوەی نییە!')) return;
   state = { tables: [], history: [], expenses: [], menu: defaultMenu };
-  save(); showToast('داتاکان سڕایەوە');
+  save();
+  showToast('داتاکان سڕایەوە');
 }
 
 function openMenuEdit() {
