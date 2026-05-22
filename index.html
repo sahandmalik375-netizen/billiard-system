@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>سیستەمی نوێی بلیارد</title>
+    <title>سیستەمی بلیاردی ژیلەس</title>
     <style>
-        /* دیزاینی نوێ و مۆدێرن بۆ مۆبایل */
         :root {
             --bg-color: #1a1a1a;
             --card-bg: #2d2d2d;
-            --primary: #27ae60; /* ڕەنگی سەوزی بلیارد */
+            --primary: #27ae60; 
             --danger: #c0392b;
+            --warning: #f39c12;
             --text: #ffffff;
         }
 
@@ -18,8 +18,9 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
             background-color: var(--bg-color); 
             color: var(--text);
-            margin: 0; 
+            margin: 0 auto; 
             padding: 15px; 
+            max-width: 1400px; /* بۆ ئەوەی لە شاشەی گەورە زۆر بڵاو نەبێتەوە */
         }
 
         header { 
@@ -28,101 +29,124 @@
             text-align: center; 
             border-radius: 12px; 
             margin-bottom: 20px; 
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
             border: 1px solid #3d3d3d;
         }
 
-        header h2 { margin: 0; font-size: 22px; color: var(--primary); }
+        header h2 { margin: 0; font-size: 24px; color: var(--primary); }
 
         .main-btn { 
             background-color: var(--primary); 
             color: white; 
             border: none; 
-            padding: 16px; 
+            padding: 15px; 
             font-size: 16px; 
-            border-radius: 10px; 
+            border-radius: 8px; 
             cursor: pointer; 
             width: 100%; 
             margin-bottom: 20px; 
             font-weight: bold; 
-            box-shadow: 0 4px 6px rgba(39, 174, 96, 0.2);
+        }
+
+        /* بەکارهێنانی Grid بۆ ئەوەی لە لاپتۆپ و مۆبایل گونجاو بێت */
+        #active-tables {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+        }
+
+        /* ئەگەر شاشەکە گەورەتر بوو لە 768px (لاپتۆپ و ئایپاد) */
+        @media (min-width: 768px) {
+            #active-tables {
+                grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            }
+            .main-btn {
+                width: auto;
+                padding: 15px 40px;
+            }
         }
 
         .table-card { 
             background: var(--card-bg); 
             padding: 20px; 
             border-radius: 12px; 
-            box-shadow: 0 4px 6px rgba(0,0,0,0.2); 
-            margin-bottom: 15px; 
             border-right: 6px solid var(--primary);
             border-top: 1px solid #3d3d3d;
+            display: flex;
+            flex-direction: column;
         }
 
-        .table-card h3 { margin: 0 0 10px 0; font-size: 18px; color: #f1c40f; }
+        .table-card h3 { margin: 0 0 15px 0; font-size: 18px; color: #f1c40f; border-bottom: 1px solid #444; padding-bottom: 10px;}
 
         .counter-section {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin: 15px 0;
             background: #222;
             padding: 10px;
             border-radius: 8px;
+            margin-bottom: 15px;
         }
 
         .counter-btn {
-            background: #444;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            font-size: 18px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: bold;
+            background: #444; color: white; border: none; padding: 8px 15px; font-size: 18px; border-radius: 6px; cursor: pointer; font-weight: bold;
         }
-
         .counter-btn.plus { background: var(--primary); }
 
-        .game-count { font-size: 20px; font-weight: bold; }
+        .game-count { font-size: 18px; font-weight: bold; }
+
+        /* بەشی خواردنەوەکان */
+        .items-section {
+            background: #1e1e1e;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+        .items-section h4 { margin: 0 0 10px 0; font-size: 14px; color: #aaa; }
+        
+        .items-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 5px;
+            margin-bottom: 10px;
+        }
+        .item-btn {
+            background: #34495e; color: white; border: none; padding: 8px 5px; font-size: 13px; border-radius: 4px; cursor: pointer;
+        }
+        .item-btn:hover { background: #2980b9; }
+
+        .order-list {
+            list-style: none; padding: 0; margin: 0; font-size: 14px;
+        }
+        .order-list li {
+            display: flex; justify-content: space-between; align-items: center; padding: 5px 0; border-bottom: 1px dashed #444;
+        }
+        .remove-item {
+            background: var(--danger); color: white; border: none; border-radius: 3px; padding: 2px 6px; cursor: pointer; font-size: 12px;
+        }
+
+        .total-price {
+            font-size: 20px; color: var(--primary); font-weight: bold; text-align: center; margin: 10px 0 15px 0;
+            background: #222; padding: 10px; border-radius: 8px; border: 1px dashed var(--primary);
+        }
 
         .action-btn {
-            width: 100%;
-            padding: 12px;
-            background: var(--danger);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-weight: bold;
-            font-size: 15px;
-            cursor: pointer;
+            width: 100%; padding: 12px; background: var(--danger); color: white; border: none; border-radius: 8px; font-weight: bold; font-size: 15px; cursor: pointer; margin-top: auto;
         }
 
         .history { 
-            margin-top: 30px; 
-            background: var(--card-bg); 
-            padding: 20px; 
-            border-radius: 12px; 
-            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
-            border: 1px solid #3d3d3d;
+            margin-top: 30px; background: var(--card-bg); padding: 20px; border-radius: 12px; border: 1px solid #3d3d3d;
         }
-
         .history h3 { margin-top: 0; color: #1abc9c; border-bottom: 1px solid #444; padding-bottom: 10px; }
-
         .history-item { 
-            border-bottom: 1px solid #3d3d3d; 
-            padding: 12px 0; 
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+            border-bottom: 1px solid #3d3d3d; padding: 12px 0; display: flex; justify-content: space-between; align-items: center;
         }
-
         .price { font-weight: bold; color: var(--primary); font-size: 1.1em; }
     </style>
 </head>
 <body>
 
     <header>
-        <h2>🎱 بەڕێوەبردنی یارییەکانی بلیارد</h2>
+        <h2>🎱 بلیاردی ژیلەس (Zhilas)</h2>
     </header>
 
     <button class="main-btn" onclick="addTable()">+ زیادکردنی کڕیار / مێزی نوێ</button>
@@ -137,19 +161,25 @@
     </div>
 
     <script>
-        // نرخی هەر یەک یاری (جەولە)
         const GAME_RATE = 500; 
 
-        // هێنانەوەی داتاکان لە مۆبایلەکە
-        let activeTables = JSON.parse(localStorage.getItem('billiard_games_tables')) || [];
-        let historyLog = JSON.parse(localStorage.getItem('billiard_games_history')) || [];
+        // لیستی مەواد و نرخەکانیان
+        const menuItems = {
+            'water': { name: 'ئاو', price: 500 },
+            'red': { name: 'ڕێد', price: 1000 },
+            'asan': { name: 'ئاسان', price: 1000 },
+            'dew': { name: 'دیوو', price: 1000 },
+            'torta': { name: 'تۆرتە', price: 1000 }
+        };
+
+        let activeTables = JSON.parse(localStorage.getItem('zhilas_billiard_tables')) || [];
+        let historyLog = JSON.parse(localStorage.getItem('zhilas_billiard_history')) || [];
 
         function saveToStorage() {
-            localStorage.setItem('billiard_games_tables', JSON.stringify(activeTables));
-            localStorage.setItem('billiard_games_history', JSON.stringify(historyLog));
+            localStorage.setItem('zhilas_billiard_tables', JSON.stringify(activeTables));
+            localStorage.setItem('zhilas_billiard_history', JSON.stringify(historyLog));
         }
 
-        // زیادکردنی مێزێکی نوێ
         function addTable() {
             const name = prompt("ناوی کڕیار یان ژمارەی مێزەکە بنووسە:");
             if (!name) return;
@@ -157,7 +187,8 @@
             const newTable = {
                 id: Date.now(),
                 name: name,
-                gamesPlayed: 1 // بە شێوەی ئۆتۆماتیکی لە یەکەم یارییەوە دەستپێدەکات
+                gamesPlayed: 1,
+                orders: {} // شوێنی خەزنکردنی داواکارییەکان: { 'water': 2, 'red': 1 }
             };
 
             activeTables.push(newTable);
@@ -165,61 +196,130 @@
             renderUI();
         }
 
-        // زیادکردنی ژمارەی یاری بە دوگمەی +
         function changeGameCount(id, amount) {
             const table = activeTables.find(t => t.id === id);
             if (table) {
                 table.gamesPlayed += amount;
-                if (table.gamesPlayed < 1) table.gamesPlayed = 1; // ڕێگە نادات لە ١ یاری کەمتر بێت
+                if (table.gamesPlayed < 1) table.gamesPlayed = 1; 
                 saveToStorage();
                 renderUI();
             }
         }
 
-        // کۆتایی هێنان بە یاری و حیسابکردنی پارە
+        function addOrderItem(id, itemKey) {
+            const table = activeTables.find(t => t.id === id);
+            if (table) {
+                if (!table.orders) table.orders = {};
+                table.orders[itemKey] = (table.orders[itemKey] || 0) + 1;
+                saveToStorage();
+                renderUI();
+            }
+        }
+
+        function removeOrderItem(id, itemKey) {
+            const table = activeTables.find(t => t.id === id);
+            if (table && table.orders && table.orders[itemKey] > 0) {
+                table.orders[itemKey]--;
+                if (table.orders[itemKey] === 0) delete table.orders[itemKey];
+                saveToStorage();
+                renderUI();
+            }
+        }
+
         function finishTable(id) {
             const tableIndex = activeTables.findIndex(t => t.id === id);
             if (tableIndex > -1) {
                 const table = activeTables[tableIndex];
-                const totalCost = table.gamesPlayed * GAME_RATE;
+                
+                // حیسابکردنی یارییەکان
+                const gamesCost = table.gamesPlayed * GAME_RATE;
+                
+                // حیسابکردنی مەوادەکان
+                let itemsCost = 0;
+                let itemsDetail = [];
+                if (table.orders) {
+                    for (const [key, qty] of Object.entries(table.orders)) {
+                        const itemPrice = menuItems[key].price * qty;
+                        itemsCost += itemPrice;
+                        itemsDetail.push(`${menuItems[key].name}(${qty})`);
+                    }
+                }
 
-                if (!confirm(`دڵنیایت لە کۆتایی هێنان بە یارییەکەی ${table.name}؟`)) return;
+                const totalCost = gamesCost + itemsCost;
 
-                // خەزنکردن لە مێژووی یارییەکان
+                if (!confirm(`دڵنیایت لە کۆتایی هێنان بە حیسابی ${table.name}؟\nکۆی گشتی: ${totalCost} دینار`)) return;
+
                 const historyItem = {
                     name: table.name,
                     games: table.gamesPlayed,
+                    itemsStr: itemsDetail.join('، ') || 'هیچ',
                     price: totalCost,
                     time: new Date().toLocaleTimeString('ku-IQ', { hour: '2-digit', minute: '2-digit' })
                 };
 
                 historyLog.push(historyItem);
-                activeTables.splice(tableIndex, 1); // سڕینەوە لە لیستە چالاکەکە
+                activeTables.splice(tableIndex, 1);
 
                 saveToStorage();
                 renderUI();
-
-                alert(`حیسابی کڕیار: ${table.name}\nکۆیی یارییەکان: ${historyItem.games} یاری\nکۆیی پارە: ${totalCost} دینار`);
             }
         }
 
-        // نوێکردنەوەی شاشەکە
         function renderUI() {
             const tablesDiv = document.getElementById('active-tables');
             tablesDiv.innerHTML = '';
 
             activeTables.forEach(table => {
-                const currentCost = table.gamesPlayed * GAME_RATE;
+                // دڵنیابوونەوە لە هەبوونی ئۆبجێکتی ئۆردەر
+                if (!table.orders) table.orders = {};
+
+                const gamesCost = table.gamesPlayed * GAME_RATE;
+                
+                let itemsCost = 0;
+                let ordersHtml = '';
+                
+                for (const [key, qty] of Object.entries(table.orders)) {
+                    const itemPrice = menuItems[key].price * qty;
+                    itemsCost += itemPrice;
+                    ordersHtml += `
+                        <li>
+                            <span>${menuItems[key].name} (x${qty})</span>
+                            <div>
+                                <span>${itemPrice} د.ع</span>
+                                <button class="remove-item" onclick="removeOrderItem(${table.id}, '${key}')">X</button>
+                            </div>
+                        </li>
+                    `;
+                }
+
+                const grandTotal = gamesCost + itemsCost;
+
                 tablesDiv.innerHTML += `
                     <div class="table-card">
                         <h3>👤 کڕیار: ${table.name}</h3>
+                        
                         <div class="counter-section">
                             <button class="counter-btn" onclick="changeGameCount(${table.id}, -1)">-</button>
                             <span class="game-count">${table.gamesPlayed} یاری</span>
                             <button class="counter-btn plus" onclick="changeGameCount(${table.id}, 1)">+</button>
                         </div>
-                        <p style="margin: 10px 0; color: #27ae60; font-weight: bold;">مبلغی ئێستا: ${currentCost} دینار</p>
-                        <button class="action-btn" onclick="finishTable(${table.id})">🔒 کۆتایی و وەرگرتنی پارە</button>
+
+                        <div class="items-section">
+                            <h4>☕ خواردنەوە و شیرینی</h4>
+                            <div class="items-grid">
+                                <button class="item-btn" onclick="addOrderItem(${table.id}, 'water')">+ ئاو</button>
+                                <button class="item-btn" onclick="addOrderItem(${table.id}, 'red')">+ ڕێد</button>
+                                <button class="item-btn" onclick="addOrderItem(${table.id}, 'asan')">+ ئاسان</button>
+                                <button class="item-btn" onclick="addOrderItem(${table.id}, 'dew')">+ دیوو</button>
+                                <button class="item-btn" onclick="addOrderItem(${table.id}, 'torta')">+ تۆرتە</button>
+                            </div>
+                            <ul class="order-list">
+                                ${ordersHtml}
+                            </ul>
+                        </div>
+
+                        <div class="total-price">کۆی گشتی: ${grandTotal} دینار</div>
+                        <button class="action-btn" onclick="finishTable(${table.id})">🔒 وەرگرتنی حیسابەکە</button>
                     </div>
                 `;
             });
@@ -232,15 +332,14 @@
                     <div class="history-item">
                         <div>
                             <p style="margin: 0; font-weight: bold;">${log.name} (${log.time})</p>
-                            <small style="color: #aaa;">ژمارەی یاری: ${log.games}</small>
+                            <small style="color: #aaa; display: block;">${log.games} یاری | مەواد: ${log.itemsStr}</small>
                         </div>
-                        <span class="price">${log.price} دینار</span>
+                        <span class="price">${log.price} د.ع</span>
                     </div>
                 `;
             });
         }
 
-        // دەستپێکردنی یەکەمجار
         renderUI();
     </script>
 </body>
