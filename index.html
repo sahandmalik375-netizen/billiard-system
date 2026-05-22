@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="ku" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>سیستەمی نوێی بلیارد</title>
+    <style>
+        /* دیزاینی نوێ و مۆدێرن بۆ مۆبایل */
+        :root {
+            --bg-color: #1a1a1a;
+            --card-bg: #2d2d2d;
+            --primary: #27ae60; /* ڕەنگی سەوزی بلیارد */
+            --danger: #c0392b;
+            --text: #ffffff;
+        }
+
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            background-color: var(--bg-color); 
+            color: var(--text);
+            margin: 0; 
+            padding: 15px; 
+        }
+
+        header { 
+            background-color: var(--card-bg); 
+            padding: 20px; 
+            text-align: center; 
+            border-radius: 12px; 
+            margin-bottom: 20px; 
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            border: 1px solid #3d3d3d;
+        }
+
+        header h2 { margin: 0; font-size: 22px; color: var(--primary); }
+
+        .main-btn { 
+            background-color: var(--primary); 
+            color: white; 
+            border: none; 
+            padding: 16px; 
+            font-size: 16px; 
+            border-radius: 10px; 
+            cursor: pointer; 
+            width: 100%; 
+            margin-bottom: 20px; 
+            font-weight: bold; 
+            box-shadow: 0 4px 6px rgba(39, 174, 96, 0.2);
+        }
+
+        .table-card { 
+            background: var(--card-bg); 
+            padding: 20px; 
+            border-radius: 12px; 
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2); 
+            margin-bottom: 15px; 
+            border-right: 6px solid var(--primary);
+            border-top: 1px solid #3d3d3d;
+        }
+
+        .table-card h3 { margin: 0 0 10px 0; font-size: 18px; color: #f1c40f; }
+
+        .counter-section {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin: 15px 0;
+            background: #222;
+            padding: 10px;
+            border-radius: 8px;
+        }
+
+        .counter-btn {
+            background: #444;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 18px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .counter-btn.plus { background: var(--primary); }
+
+        .game-count { font-size: 20px; font-weight: bold; }
+
+        .action-btn {
+            width: 100%;
+            padding: 12px;
+            background: var(--danger);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 15px;
+            cursor: pointer;
+        }
+
+        .history { 
+            margin-top: 30px; 
+            background: var(--card-bg); 
+            padding: 20px; 
+            border-radius: 12px; 
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+            border: 1px solid #3d3d3d;
+        }
+
+        .history h3 { margin-top: 0; color: #1abc9c; border-bottom: 1px solid #444; padding-bottom: 10px; }
+
+        .history-item { 
+            border-bottom: 1px solid #3d3d3d; 
+            padding: 12px 0; 
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .price { font-weight: bold; color: var(--primary); font-size: 1.1em; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h2>🎱 بەڕێوەبردنی یارییەکانی بلیارد</h2>
+    </header>
+
+    <button class="main-btn" onclick="addTable()">+ زیادکردنی کڕیار / مێزی نوێ</button>
+
+    <!-- مێزە ئەکتیڤەکان -->
+    <div id="active-tables"></div>
+
+    <!-- تۆماری کۆتایی -->
+    <div class="history">
+        <h3>📜 تۆماری گشتی و حیساباتی ئەمڕۆ</h3>
+        <div id="history-list"></div>
+    </div>
+
+    <script>
+        // نرخی هەر یەک یاری (جەولە)
+        const GAME_RATE = 500; 
+
+        // هێنانەوەی داتاکان لە مۆبایلەکە
+        let activeTables = JSON.parse(localStorage.getItem('billiard_games_tables')) || [];
+        let historyLog = JSON.parse(localStorage.getItem('billiard_games_history')) || [];
+
+        function saveToStorage() {
+            localStorage.setItem('billiard_games_tables', JSON.stringify(activeTables));
+            localStorage.setItem('billiard_games_history', JSON.stringify(historyLog));
+        }
+
+        // زیادکردنی مێزێکی نوێ
+        function addTable() {
+            const name = prompt("ناوی کڕیار یان ژمارەی مێزەکە بنووسە:");
+            if (!name) return;
+
+            const newTable = {
+                id: Date.now(),
+                name: name,
+                gamesPlayed: 1 // بە شێوەی ئۆتۆماتیکی لە یەکەم یارییەوە دەستپێدەکات
+            };
+
+            activeTables.push(newTable);
+            saveToStorage();
+            renderUI();
+        }
+
+        // زیادکردنی ژمارەی یاری بە دوگمەی +
+        function changeGameCount(id, amount) {
+            const table = activeTables.find(t => t.id === id);
+            if (table) {
+                table.gamesPlayed += amount;
+                if (table.gamesPlayed < 1) table.gamesPlayed = 1; // ڕێگە نادات لە ١ یاری کەمتر بێت
+                saveToStorage();
+                renderUI();
+            }
+        }
+
+        // کۆتایی هێنان بە یاری و حیسابکردنی پارە
+        function finishTable(id) {
+            const tableIndex = activeTables.findIndex(t => t.id === id);
+            if (tableIndex > -1) {
+                const table = activeTables[tableIndex];
+                const totalCost = table.gamesPlayed * GAME_RATE;
+
+                if (!confirm(`دڵنیایت لە کۆتایی هێنان بە یارییەکەی ${table.name}؟`)) return;
+
+                // خەزنکردن لە مێژووی یارییەکان
+                const historyItem = {
+                    name: table.name,
+                    games: table.gamesPlayed,
+                    price: totalCost,
+                    time: new Date().toLocaleTimeString('ku-IQ', { hour: '2-digit', minute: '2-digit' })
+                };
+
+                historyLog.push(historyItem);
+                activeTables.splice(tableIndex, 1); // سڕینەوە لە لیستە چالاکەکە
+
+                saveToStorage();
+                renderUI();
+
+                alert(`حیسابی کڕیار: ${table.name}\nکۆیی یارییەکان: ${historyItem.games} یاری\nکۆیی پارە: ${totalCost} دینار`);
+            }
+        }
+
+        // نوێکردنەوەی شاشەکە
+        function renderUI() {
+            const tablesDiv = document.getElementById('active-tables');
+            tablesDiv.innerHTML = '';
+
+            activeTables.forEach(table => {
+                const currentCost = table.gamesPlayed * GAME_RATE;
+                tablesDiv.innerHTML += `
+                    <div class="table-card">
+                        <h3>👤 کڕیار: ${table.name}</h3>
+                        <div class="counter-section">
+                            <button class="counter-btn" onclick="changeGameCount(${table.id}, -1)">-</button>
+                            <span class="game-count">${table.gamesPlayed} یاری</span>
+                            <button class="counter-btn plus" onclick="changeGameCount(${table.id}, 1)">+</button>
+                        </div>
+                        <p style="margin: 10px 0; color: #27ae60; font-weight: bold;">مبلغی ئێستا: ${currentCost} دینار</p>
+                        <button class="action-btn" onclick="finishTable(${table.id})">🔒 کۆتایی و وەرگرتنی پارە</button>
+                    </div>
+                `;
+            });
+
+            const historyDiv = document.getElementById('history-list');
+            historyDiv.innerHTML = '';
+
+            historyLog.slice().reverse().forEach(log => {
+                historyDiv.innerHTML += `
+                    <div class="history-item">
+                        <div>
+                            <p style="margin: 0; font-weight: bold;">${log.name} (${log.time})</p>
+                            <small style="color: #aaa;">ژمارەی یاری: ${log.games}</small>
+                        </div>
+                        <span class="price">${log.price} دینار</span>
+                    </div>
+                `;
+            });
+        }
+
+        // دەستپێکردنی یەکەمجار
+        renderUI();
+    </script>
+</body>
+</html>
